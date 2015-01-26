@@ -1,0 +1,17 @@
+[
+{
+  "modid": "opengrave",
+  "name": "Open Grave",
+  "description": "The simple gravestone mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "",
+  "url": "",
+  "updateUrl": "",
+  "authors": ["Yopu",],
+  "credits": "Made by Yopu",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
