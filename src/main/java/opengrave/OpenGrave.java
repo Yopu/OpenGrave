@@ -2,10 +2,8 @@ package opengrave;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = "opengrave")

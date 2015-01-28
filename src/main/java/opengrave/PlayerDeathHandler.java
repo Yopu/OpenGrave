@@ -21,15 +21,15 @@ public class PlayerDeathHandler {
             y = y < 0 ? 1 : y;
             int z = floor_double(entity.posZ);
 
-            while (y < 256 && !world.isAirBlock(x, y, z))
+            while (y < 256 && !world.isAirBlock(x, y, z)) // Float up to the top of liquids/walls
                 y++;
 
-            while (y > 1 && world.isAirBlock(x, y - 1, z))
+            while (y > 1 && (!world.isAirBlock(x, y, z) || world.isAirBlock(x, y - 1, z))) // Descend to the first valid position
                 y--;
 
-            if (world.setBlock(x, y, z, OpenGrave.blockGrave)) {
+            if (BlockUtil.safeSetBlock(world, x, y, z, OpenGrave.blockGrave)) {
                 TileEntity tileEntity = world.getTileEntity(x, y, z);
-                if (tileEntity instanceof TileEntityGrave) {
+                if (tileEntity != null && tileEntity instanceof TileEntityGrave) {
                     ((TileEntityGrave) tileEntity).addAllItems(event.drops);
                     event.setCanceled(true);
                 }
