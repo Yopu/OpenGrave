@@ -21,7 +21,7 @@ public class PlayerDeathHandler {
             y = y < 0 ? 1 : y;
             int z = floor_double(entity.posZ);
 
-            while (y < 256 && !world.isAirBlock(x, y, z)) // Float up to the top of liquids/walls
+            while (y < world.getActualHeight() - 1 && !world.isAirBlock(x, y, z)) // Float up to the top of liquids/walls
                 y++;
 
             while (y > 1 && (!world.isAirBlock(x, y, z) || world.isAirBlock(x, y - 1, z))) // Descend to the first valid position
