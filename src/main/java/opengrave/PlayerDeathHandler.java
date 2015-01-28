@@ -8,8 +8,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 
-import java.util.List;
-
 import static net.minecraft.util.MathHelper.floor_double;
 
 public class PlayerDeathHandler {
@@ -21,12 +19,13 @@ public class PlayerDeathHandler {
             World world = entity.worldObj;
             int x = floor_double(entity.posX);
             int y = floor_double(entity.posY);
+            y = y < 0 ? 1 : y;
             int z = floor_double(entity.posZ);
 
-            while (y <= 256 && !world.isAirBlock(x, y ,z))
+            while (y < 256 && !world.isAirBlock(x, y, z))
                 y++;
 
-            while (y >= 1 && world.isAirBlock(x, y - 1, z))
+            while (y > 1 && world.isAirBlock(x, y - 1, z))
                 y--;
 
             if (world.setBlock(x, y, z, OpenGrave.blockGrave)) {
