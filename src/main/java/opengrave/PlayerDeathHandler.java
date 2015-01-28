@@ -2,7 +2,6 @@ package opengrave;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -32,8 +31,7 @@ public class PlayerDeathHandler {
                 TileEntity tileEntity = world.getTileEntity(x, y, z);
                 if (tileEntity instanceof TileEntityGrave) {
                     ((TileEntityGrave) tileEntity).addAllItems(event.drops);
-                    for (EntityItem entityItem : event.drops)
-                        entityItem.setDead();
+                    event.setCanceled(true);
                 }
             }
         }
