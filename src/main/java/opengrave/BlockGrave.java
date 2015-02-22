@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,6 +23,7 @@ public class BlockGrave extends BlockContainer {
     public BlockGrave() {
         super(Material.rock);
         setHardness(1.5F);
+        setResistance(6000000.0F);
         setBlockName(BlockGrave.class.getSimpleName());
         setBlockTextureName("opengrave:block.grave");
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.1F, 1.0F);
