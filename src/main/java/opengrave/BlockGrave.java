@@ -5,7 +5,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +15,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.util.List;
 import java.util.Random;
 
 public class BlockGrave extends BlockContainer {
@@ -29,18 +29,41 @@ public class BlockGrave extends BlockContainer {
         setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.1F, 1.0F);
     }
 
+    public static boolean spawnGraveBlock(World world, int x, int y, int z, List<ItemStack> drops) {
+        if (BlockUtil.safeSetBlock(world, x, y, z, OpenGrave.blockGrave)) {
+            TileEntity tileEntity = world.getTileEntity(x, y, z);
+            if (tileEntity != null && tileEntity instanceof TileEntityGrave) {
+                ((TileEntityGrave) tileEntity).addAllItemStacks(drops);
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
         TileEntityGrave tileEntityGrave = (TileEntityGrave) world.getTileEntity(x, y, z);
-        if (tileEntityGrave != null)
+        if (tileEntityGrave != null && !tileEntityGrave.isBeingDestroyed())
             tileEntityGrave.dropAllItems();
         super.breakBlock(world, x, y, z, block, meta);
     }
 
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        if (world.isAirBlock(x, y - 1, z))
+        if (y == 0) return;
+        if (!world.isAirBlock(x, y - 1, z)) return;
+
+        int airY = y - 2;
+        while (world.isAirBlock(x, airY, z) && airY > 1)
+            airY--;
+
+        TileEntityGrave tileEntity = (TileEntityGrave) world.getTileEntity(x, y, z);
+        List<ItemStack> itemStacks = tileEntity.getItemStacks();
+
+        if (spawnGraveBlock(world, x, airY + 1, z, itemStacks)) {
+            tileEntity.setToBeDestroyed();
             world.setBlockToAir(x, y, z);
+        }
     }
 
     @SideOnly(Side.CLIENT)

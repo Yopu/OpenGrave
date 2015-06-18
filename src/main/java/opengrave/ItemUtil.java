@@ -4,6 +4,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ItemUtil {
@@ -22,5 +24,13 @@ public class ItemUtil {
         entityItem.motionZ = random.nextGaussian() * 0.05F;
 
         return world.spawnEntityInWorld(entityItem);
+    }
+
+    public static List<ItemStack> getItemStacks(List<EntityItem> items) {
+        ArrayList<ItemStack> itemStacks = new ArrayList<ItemStack>();
+        for (EntityItem entityItem : items) {
+            itemStacks.add(entityItem.getEntityItem());
+        }
+        return itemStacks;
     }
 }

@@ -3,9 +3,11 @@ package opengrave;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+
+import java.util.List;
 
 import static net.minecraft.util.MathHelper.floor_double;
 
@@ -27,13 +29,9 @@ public class PlayerDeathHandler {
             while (y > 1 && (!world.isAirBlock(x, y, z) || world.isAirBlock(x, y - 1, z))) // Descend to the first valid position
                 y--;
 
-            if (BlockUtil.safeSetBlock(world, x, y, z, OpenGrave.blockGrave)) {
-                TileEntity tileEntity = world.getTileEntity(x, y, z);
-                if (tileEntity != null && tileEntity instanceof TileEntityGrave) {
-                    ((TileEntityGrave) tileEntity).addAllItems(event.drops);
-                    event.setCanceled(true);
-                }
-            }
+            List<ItemStack> itemStacks = ItemUtil.getItemStacks(event.drops);
+            if (BlockGrave.spawnGraveBlock(world, x, y, z, itemStacks))
+                event.setCanceled(true);
         }
     }
 }
