@@ -76,16 +76,15 @@ processResources {
     }
 }
 
+jar.dependsOn shadowJar
+jar.enabled = false
+
 shadowJar {
+    archiveName = tasks.jar.archiveName
     configurations = [project.configurations.shadow]
     relocate 'kotlin', 'opengrave.repack.kotlin'
     relocate 'org.jetbrains', 'opengrave.repack.org.jetbrains'
 }
-
-reobfJar {
-    setJar(tasks.shadowJar.archivePath)
-}
-reobfJar.dependsOn shadowJar
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
