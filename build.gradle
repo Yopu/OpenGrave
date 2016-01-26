@@ -19,11 +19,13 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 def mcversion = '1.8.9'
 def forgeversion = '11.15.0.1718'
@@ -49,8 +51,8 @@ repositories {
 }
 
 dependencies {
-    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 processResources {
@@ -74,18 +76,14 @@ processResources {
     }
 }
 
-jar {
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
+shadowJar {
+    relocate 'kotlin', 'opengrave.repack.kotlin'
 }
 
 reobfJar {
-    addExtraSrgLine "PK: kotlin opengrave/repack/kotlin"
-    addExtraSrgLine "PK: org/jetbrains opengrave/repack/org/jetbrains"
+    setJar(tasks.shadowJar.archivePath)
 }
+reobfJar.dependsOn shadowJar
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
