@@ -82,6 +82,11 @@ jar {
     }
 }
 
+reobfJar {
+    addExtraSrgLine "PK: kotlin opengrave/repack/kotlin"
+    addExtraSrgLine "PK: org/jetbrains opengrave/repack/org/jetbrains"
+}
+
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
 }
