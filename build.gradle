@@ -1,35 +1,56 @@
 buildscript {
+    ext.kotlin_version = '1.0.0-beta-4589'
+
     repositories {
+        jcenter()
         mavenCentral()
+
         maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
         }
+
         maven {
             name = 'sonatype'
             url = 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
     }
+
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'kotlin'
 
-def mcversion = '1.7.10'
-def forgeversion = '10.13.4.1448-1.7.10'
+def mcversion = '1.8.9'
+def forgeversion = '11.15.0.1718'
 
-version = "$mcversion-1.4"
-group = "yopu.opengrave"
+version = "$mcversion-2.0"
+group = 'yopu.opengrave'
 archivesBaseName = "OpenGrave"
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
 
 minecraft {
     version = "$mcversion-$forgeversion"
     runDir = 'run'
+    mappings = 'snapshot_20160124'
+    makeObfSourceJar = false
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
+    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 processResources {
@@ -51,4 +72,16 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
 }
