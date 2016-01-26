@@ -7,26 +7,26 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
-import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.entity.player.PlayerDropsEvent
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DeathHandler {
 
     @SubscribeEvent
-    fun handleDeath(event: LivingDeathEvent?) {
+    fun handleDeath(event: PlayerDropsEvent?) {
         if (event == null) return
-        val entity = event.entity as? EntityPlayer?
-        val world = entity?.entityWorld
+        val entity = event.entity as? EntityPlayer? ?: return
+        val world = entity.entityWorld
         if (world == null || world.isRemote) return
 
-        if (entity != null) {
-            debugLog.finest("handling $event")
-            val pos = entity.findIdealGravePos()
-            debugLog.finest("using $pos")
-            world.setBlockState(pos, BlockGrave.defaultState, 3)
-            val tileEntity = world.getTileEntity(pos) as TileEntityGrave?
-            tileEntity?.takePlayerInventory(entity)
+        debugLog.finest("handling $event")
+        val pos = entity.findIdealGravePos()
+        debugLog.finest("using $pos")
+        world.setBlockState(pos, BlockGrave.defaultState, 3)
+        val tileEntity = world.getTileEntity(pos) as TileEntityGrave?
+        if (tileEntity?.takeDrops(event.drops) ?: false) {
+            event.isCanceled = true
         }
     }
 
