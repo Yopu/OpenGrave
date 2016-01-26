@@ -25,7 +25,8 @@ object DeathHandler {
         debugLog.finest("using $pos")
         world.setBlockState(pos, BlockGrave.defaultState, 3)
         val tileEntity = world.getTileEntity(pos) as TileEntityGrave?
-        if (tileEntity?.takeDrops(event.drops) ?: false) {
+        val deathMessage = event.source?.getDeathMessage(entity)
+        if (tileEntity?.takeDrops(event.drops, deathMessage) ?: false) {
             event.isCanceled = true
         }
     }

@@ -9,22 +9,27 @@ import net.minecraft.nbt.NBTBase
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.IChatComponent
+import net.minecraft.util.IChatComponent.Serializer
 
 class TileEntityGrave : TileEntity() {
 
     companion object {
-        val ID = "opengrave.tileentitygrave"
-        val INVENTORY_NBT_KEY = "inventory"
+        const val ID = "opengrave.tileentitygrave"
+        const val INVENTORY_NBT_KEY = "inventory"
+        const val DEATH_MESSAGE_NBT_KEY = "death_message"
     }
 
     val inventory = arrayListOf<ItemStack>()
+    var deathMessage: IChatComponent? = null
 
     private val inventoryWrapper: IInventory
         get() = InventoryBasic("throwaway", false, inventory.size).apply {
             inventory.forEachIndexed { i, stack -> setInventorySlotContents(i, stack) }
         }
 
-    fun takeDrops(items: MutableList<EntityItem?>?): Boolean {
+    fun takeDrops(items: MutableList<EntityItem?>?, deathMessage: IChatComponent?): Boolean {
+        this.deathMessage = deathMessage
         val actualDrops = items.orEmpty().filterNotNull().map { it.entityItem }
         inventory.clear()
         return inventory.addAll(actualDrops)
@@ -35,6 +40,10 @@ class TileEntityGrave : TileEntity() {
     override fun readFromNBT(compound: NBTTagCompound?) {
         super.readFromNBT(compound)
         val rootTagCompound = compound?.getCompoundTag(ID)
+
+        val json = rootTagCompound?.getString(DEATH_MESSAGE_NBT_KEY).orEmpty()
+        deathMessage = Serializer.jsonToComponent(json)
+
         val tagList = rootTagCompound?.getTagList(INVENTORY_NBT_KEY, NBTBase.NBT_TYPES.indexOf("COMPOUND"))
         if (tagList == null) {
             debugLog.severe("$this unable to read from nbt!")
@@ -50,6 +59,10 @@ class TileEntityGrave : TileEntity() {
     override fun writeToNBT(compound: NBTTagCompound?) {
         super.writeToNBT(compound)
         val rootTagCompound = NBTTagCompound()
+
+        val json = Serializer.componentToJson(deathMessage)
+        rootTagCompound.setString(DEATH_MESSAGE_NBT_KEY, json)
+
         val tagList = NBTTagList()
         inventory.map { it.serializeNBT() }.filterNotNull().forEach { tagList.appendTag(it) }
         rootTagCompound.setTag(INVENTORY_NBT_KEY, tagList)
