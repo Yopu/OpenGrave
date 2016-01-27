@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.MovingObjectPosition
+import net.minecraft.world.Explosion
 import net.minecraft.world.World
 import java.util.*
 
@@ -34,6 +35,10 @@ object BlockGrave : BlockContainer(Material.rock) {
 
     override fun getPickBlock(target: MovingObjectPosition?, world: World?, pos: BlockPos?, player: EntityPlayer?) = null
     override fun getItemDropped(state: IBlockState?, rand: Random?, fortune: Int) = null
+
+    override fun canDropFromExplosion(explosionIn: Explosion?) = false
+    override fun onBlockExploded(world: World?, pos: BlockPos?, explosion: Explosion?) {
+    }
 
     override fun getRenderType() = 3
     override fun isOpaqueCube() = false

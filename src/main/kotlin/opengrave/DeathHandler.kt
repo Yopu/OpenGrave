@@ -3,8 +3,10 @@ package opengrave
 import net.minecraft.block.BlockLiquid
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.IChatComponent
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
@@ -23,12 +25,21 @@ object DeathHandler {
         debugLog.finest("handling $event")
         val pos = entity.findIdealGravePos()
         debugLog.finest("using $pos")
-        world.setBlockState(pos, BlockGrave.defaultState, 3)
-        val tileEntity = world.getTileEntity(pos) as TileEntityGrave?
         val deathMessage = event.source?.getDeathMessage(entity)
-        if (tileEntity?.takeDrops(event.drops, deathMessage) ?: false) {
+        val drops = event.drops.orEmpty().filterNotNull().map { it.entityItem }
+        if (world.spawnGrave(pos, drops, deathMessage)) {
             event.isCanceled = true
         }
+    }
+
+    fun World.spawnGrave(pos: BlockPos, drops: List<ItemStack>, deathMessage: IChatComponent?): Boolean {
+        val blockHardness = getBlockState(pos).block.getBlockHardness(this, pos)
+        if (blockHardness < 0)
+            return false
+
+        setBlockState(pos, BlockGrave.defaultState, 3)
+        val tileEntity = getTileEntity(pos) as TileEntityGrave?
+        return tileEntity?.takeDrops(drops, deathMessage) ?: false
     }
 
     fun Entity.findIdealGravePos(): BlockPos {
@@ -40,10 +51,10 @@ object DeathHandler {
                 return possibleFloatingPosition
             }
         }
-        return worldObj.findNearestIdealGravePos(position)
+        return time { worldObj.findNearestIdealGravePos(position) }
     }
 
-    fun IBlockAccess.findNearestIdealGravePos(pos: BlockPos): BlockPos {
+    fun World.findNearestIdealGravePos(pos: BlockPos): BlockPos {
         debugLog.finest("finding nearest ideal grave pos $pos")
         val stack = arrayListOf<BlockPos>()
         stack += pos
@@ -51,7 +62,7 @@ object DeathHandler {
             val nextPos = stack.removeAt(0)
             if (isIdealGravePosition(nextPos))
                 return nextPos
-            if (pos.distanceSq(nextPos) >= 256)
+            if (pos.distanceSq(nextPos) >= 10)
                 break
             for (side in EnumFacing.VALUES)
                 stack += nextPos.offset(side)
@@ -78,14 +89,14 @@ object DeathHandler {
         return null
     }
 
-    fun IBlockAccess.isLiquidBlock(pos: BlockPos): Boolean {
+    fun World.isLiquidBlock(pos: BlockPos): Boolean {
         val block = getBlockState(pos).block
         val b = block is BlockLiquid || block is IFluidBlock
         debugLog.finest("$pos ${if (b) "is" else "is not"} a liquid")
         return b
     }
 
-    fun IBlockAccess.isIdealGravePosition(pos: BlockPos): Boolean {
+    fun World.isIdealGravePosition(pos: BlockPos): Boolean {
         val isAir = isAirBlock(pos)
         val downBlockState = getBlockState(pos.down())
         val goodPlatform = downBlockState.block.isSideSolid(this, pos.down(), EnumFacing.UP)

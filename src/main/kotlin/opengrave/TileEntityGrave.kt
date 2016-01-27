@@ -1,6 +1,5 @@
 package opengrave
 
-import net.minecraft.entity.item.EntityItem
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.InventoryBasic
 import net.minecraft.inventory.InventoryHelper
@@ -20,7 +19,7 @@ class TileEntityGrave : TileEntity() {
         const val DEATH_MESSAGE_NBT_KEY = "death_message"
     }
 
-    val inventory = arrayListOf<ItemStack>()
+    val inventory = arrayListOf<ItemStack?>()
     var deathMessage: IChatComponent? = null
 
     private val inventoryWrapper: IInventory
@@ -28,11 +27,10 @@ class TileEntityGrave : TileEntity() {
             inventory.forEachIndexed { i, stack -> setInventorySlotContents(i, stack) }
         }
 
-    fun takeDrops(items: MutableList<EntityItem?>?, deathMessage: IChatComponent?): Boolean {
+    fun takeDrops(items: List<ItemStack>, deathMessage: IChatComponent?): Boolean {
         this.deathMessage = deathMessage
-        val actualDrops = items.orEmpty().filterNotNull().map { it.entityItem }
         inventory.clear()
-        return inventory.addAll(actualDrops)
+        return inventory.addAll(items)
     }
 
     fun dropItems() = InventoryHelper.dropInventoryItems(world, pos, inventoryWrapper)
@@ -64,7 +62,7 @@ class TileEntityGrave : TileEntity() {
         rootTagCompound.setString(DEATH_MESSAGE_NBT_KEY, json)
 
         val tagList = NBTTagList()
-        inventory.map { it.serializeNBT() }.filterNotNull().forEach { tagList.appendTag(it) }
+        inventory.map { it?.serializeNBT() }.filterNotNull().forEach { tagList.appendTag(it) }
         rootTagCompound.setTag(INVENTORY_NBT_KEY, tagList)
         compound?.setTag(ID, rootTagCompound) ?: debugLog.severe("$this unable to write to nbt!")
     }
