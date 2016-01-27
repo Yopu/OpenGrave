@@ -30,14 +30,16 @@ val debugLog = Logger.getAnonymousLogger().apply {
 }
 
 fun debugPreInit(event: FMLPreInitializationEvent?) {
-    MinecraftForge.EVENT_BUS.register(DebugClickHandler)
+    if (DEBUG_MODE) {
+        MinecraftForge.EVENT_BUS.register(DebugClickHandler)
+    }
 }
 
 object DebugClickHandler {
 
     @SubscribeEvent
     fun handleClick(event: PlayerInteractEvent?) {
-        if (event == null || event.world.isRemote) return
+        if (!DEBUG_MODE || event == null || event.world.isRemote) return
         val rightClickingBlock = event.action == RIGHT_CLICK_BLOCK
         val rightClickingAir = event.action == RIGHT_CLICK_AIR
         val crouching = event.entityPlayer.isSneaking
