@@ -2,7 +2,7 @@
 #### A lightweight mod that just adds a gravestone. No frills.
 [Download latest v2.0 (1.8.9)](https://github.com/Yopu/OpenGrave/releases/download/2.0/OpenGrave-1.8.9-2.0.jar)
 
-[Download v1.4 (1.7.10)](https://github.com/Yopu/OpenGrave/releases/download/1.4/OpenGrave-1.7.10-1.4.jar)
+[Download v1.5 (1.7.10)](https://github.com/Yopu/OpenGrave/releases/download/1.5/OpenGrave-1.7.10-1.5.jar)
 
 * Updated to 1.8.9!
 * New block model!
