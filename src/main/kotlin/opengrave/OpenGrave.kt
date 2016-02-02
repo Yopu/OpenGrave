@@ -14,9 +14,14 @@ object OpenGrave {
     @EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
         debugLog.info("Opengrave preinit $event")
+
         GameRegistry.registerBlock(BlockGrave)
         GameRegistry.registerTileEntity(TileEntityGrave::class.java, TileEntityGrave.ID)
+
+        GameRegistry.registerItem(ItemGraveCompass)
+
         MinecraftForge.EVENT_BUS.register(DeathHandler)
+        MinecraftForge.EVENT_BUS.register(RespawnHandler)
         debugPreInit(event)
     }
 }

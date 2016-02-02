@@ -1,33 +1,33 @@
 package opengrave
 
-import net.minecraft.block.BlockLiquid
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.IChatComponent
-import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
-import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DeathHandler {
 
+    const val LAST_DEATH_KEY = "last_death_pos"
+
     @SubscribeEvent
     fun handleDeath(event: PlayerDropsEvent?) {
         if (event == null) return
-        val entity = event.entity as? EntityPlayer? ?: return
-        val world = entity.entityWorld
+        val player = event.entity as? EntityPlayer? ?: return
+        val world = player.entityWorld
         if (world == null || world.isRemote) return
 
         debugLog.finest("handling $event")
-        val pos = entity.findIdealGravePos()
+        val pos = player.findIdealGravePos()
         debugLog.finest("using $pos")
-        val deathMessage = event.source?.getDeathMessage(entity)
+        val deathMessage = event.source?.getDeathMessage(player)
         val drops = event.drops.orEmpty().filterNotNull().map { it.entityItem }
         if (world.spawnGrave(pos, drops, deathMessage)) {
+            player.entityData.setIntArray(LAST_DEATH_KEY, pos.toIntArray())
             event.isCanceled = true
         }
     }
@@ -87,13 +87,6 @@ object DeathHandler {
         }
         debugLog.finest("couldn't find a floating position")
         return null
-    }
-
-    fun World.isLiquidBlock(pos: BlockPos): Boolean {
-        val block = getBlockState(pos).block
-        val b = block is BlockLiquid || block is IFluidBlock
-        debugLog.finest("$pos ${if (b) "is" else "is not"} a liquid")
-        return b
     }
 
     fun World.isIdealGravePosition(pos: BlockPos): Boolean {
