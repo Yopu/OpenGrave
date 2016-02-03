@@ -12,8 +12,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DeathHandler {
 
-    const val LAST_DEATH_KEY = "last_death_pos"
-
     @SubscribeEvent
     fun handleDeath(event: PlayerDropsEvent?) {
         if (event == null) return
@@ -27,7 +25,7 @@ object DeathHandler {
         val deathMessage = event.source?.getDeathMessage(player)
         val drops = event.drops.orEmpty().filterNotNull().map { it.entityItem }
         if (world.spawnGrave(pos, drops, deathMessage)) {
-            player.entityData.setIntArray(LAST_DEATH_KEY, pos.toIntArray())
+            player.getDeathCapability()?.pos = pos
             event.isCanceled = true
         }
     }
