@@ -7,6 +7,8 @@ import net.minecraft.world.World
 import net.minecraftforge.fluids.IFluidBlock
 
 fun BlockPos.toIntArray(): IntArray = intArrayOf(x, y, z)
+fun BlockPos.toNBTTag() = NBTTagIntArray(toIntArray())
+fun NBTTagIntArray.toBlockPos() = intArray.toBlockPos()
 fun IntArray.toNBTTag() = NBTTagIntArray(this)
 fun IntArray.toBlockPos(): BlockPos? {
     if (size == 3)
