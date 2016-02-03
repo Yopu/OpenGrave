@@ -5,4 +5,5 @@
 *.iml
 *.ipr
 *.iws
+gradle.properties
 ModelCreator*.jar
