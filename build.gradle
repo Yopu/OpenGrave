@@ -28,9 +28,9 @@ apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 def mcversion = '1.8.9'
-def forgeversion = '11.15.0.1718'
+def forgeversion = '11.15.1.1722'
 
-version = "$mcversion-2.0"
+version = "$mcversion-2.1"
 group = 'yopu.opengrave'
 archivesBaseName = "OpenGrave"
 
@@ -88,4 +88,13 @@ shadowJar {
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
+}
+
+task cleanSSP(type: Delete) {
+    delete fileTree(dir: testWorldDir, include: 'OpenGrave-*.jar')
+}
+
+task copyToSSP(type: Copy, dependsOn: cleanSSP) {
+    from tasks.jar.archivePath
+    into testWorldDir
 }

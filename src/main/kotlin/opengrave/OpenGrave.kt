@@ -3,13 +3,18 @@ package opengrave
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
+import net.minecraftforge.fml.common.Mod.InstanceFactory
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.registry.GameRegistry
 
 const val MODID = "opengrave"
 
-@Mod(modid = MODID, modLanguage = "Kotlin", modLanguageAdapter = "io.drakon.forgelin.KotlinAdapter")
+@Mod(modid = MODID, modLanguage = "Kotlin")
 object OpenGrave {
+
+    @JvmStatic
+    @InstanceFactory
+    fun instanceFactory() = this
 
     @EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
