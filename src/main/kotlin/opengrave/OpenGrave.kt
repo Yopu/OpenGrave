@@ -8,6 +8,9 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.Mod.InstanceFactory
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.registry.GameRegistry
+import opengrave.handler.DeathCapabilityHandler
+import opengrave.handler.DeathHandler
+import opengrave.handler.RespawnHandler
 
 const val MODID = "opengrave"
 

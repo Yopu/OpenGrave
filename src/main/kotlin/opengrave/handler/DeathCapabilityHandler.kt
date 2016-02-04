@@ -1,4 +1,4 @@
-package opengrave
+package opengrave.handler
 
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.EnumFacing
@@ -7,6 +7,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager
 import net.minecraftforge.event.AttachCapabilitiesEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import opengrave.*
 
 object DeathCapabilityHandler {
 
@@ -14,7 +15,7 @@ object DeathCapabilityHandler {
     fun attachToPlayer(event: AttachCapabilitiesEvent.Entity?) {
         val player = event?.entity
         if (player is EntityPlayer) {
-            event?.addCapability(ResourceLocation("$MODID:DeathPositionCapability"), DeathPositionCapability())
+            event?.addCapability(ResourceLocation("${MODID}:DeathPositionCapability"), DeathPositionCapability())
         }
     }
 

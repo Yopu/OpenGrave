@@ -1,9 +1,12 @@
-package opengrave
+package opengrave.handler
 
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent
+import opengrave.ItemGraveCompass
 import opengrave.ItemGraveCompass.LAST_DEATH_KEY
+import opengrave.getDeathCapability
+import opengrave.toNBTTag
 
 object RespawnHandler {
 

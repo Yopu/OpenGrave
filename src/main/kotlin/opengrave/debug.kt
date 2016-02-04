@@ -8,8 +8,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_C
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import opengrave.DeathHandler.findIdealGravePos
-import opengrave.DeathHandler.spawnGrave
+import opengrave.handler.DeathHandler.findIdealGravePos
+import opengrave.handler.DeathHandler.spawnGrave
 import java.time.Duration
 import java.time.Instant
 import java.util.logging.ConsoleHandler

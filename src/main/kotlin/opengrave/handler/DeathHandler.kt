@@ -1,4 +1,4 @@
-package opengrave
+package opengrave.handler
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
@@ -9,6 +9,7 @@ import net.minecraft.util.IChatComponent
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import opengrave.*
 
 object DeathHandler {
 
