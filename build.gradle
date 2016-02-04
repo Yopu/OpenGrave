@@ -34,11 +34,6 @@ version = "$mcversion-2.1"
 group = 'yopu.opengrave'
 archivesBaseName = "OpenGrave"
 
-configurations {
-    shadow
-    compile.extendsFrom shadow
-}
-
 minecraft {
     version = "$mcversion-$forgeversion"
     runDir = 'run'
@@ -46,8 +41,21 @@ minecraft {
     makeObfSourceJar = false
 }
 
+runClient {
+    environment 'opengrave.debug', 'true'
+}
+
+runServer {
+    environment 'opengrave.debug', 'true'
+}
+
 repositories {
     mavenCentral()
+}
+
+configurations {
+    shadow
+    compile.extendsFrom shadow
 }
 
 dependencies {
