@@ -15,7 +15,7 @@ import java.util.*
 object BlockGrave : BlockContainer(Material.rock) {
 
     init {
-        setRegistryName("blockgrave")
+        registryName = "blockgrave"
         setHardness(5.0F)
         setResistance(6000000.0F)
         setBlockBounds(0.0625F, 0.0F, 0.375F, 0.9375F, 0.875F, 0.625F)

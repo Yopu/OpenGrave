@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.0.0-beta-4589'
+    ext.kotlin_version = '1.0.3'
 
     repositories {
         jcenter()
@@ -8,11 +8,6 @@ buildscript {
         maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
-        }
-
-        maven {
-            name = 'sonatype'
-            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
     }
 
@@ -30,7 +25,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 def mcversion = '1.8.9'
 def forgeversion = '11.15.1.1722'
 
-version = "$mcversion-2.1"
+version = "$mcversion-2.2"
 group = 'yopu.opengrave'
 archivesBaseName = "OpenGrave"
 

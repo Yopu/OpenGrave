@@ -8,11 +8,20 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.IChatComponent
 import net.minecraft.world.World
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DeathHandler {
+
+    var lastDeathInventory: Array<ItemStack?> = emptyArray()
+
+    @SubscribeEvent
+    fun handlePreDeath(event: LivingDeathEvent?) {
+        val entity = event?.entity as? EntityPlayer ?: return
+        lastDeathInventory = entity.fullInventory
+    }
 
     @SubscribeEvent
     fun handleDeath(event: PlayerDropsEvent?) {
@@ -25,20 +34,20 @@ object DeathHandler {
         val pos = entity.findIdealGravePos()
         debugLog.finest("using $pos")
         val deathMessage = event.source?.getDeathMessage(entity)
-        val drops = event.drops.orEmpty().filterNotNull().map { it.entityItem }
-        if (world.spawnGrave(pos, drops, deathMessage)) {
+        if (world.spawnGrave(pos, lastDeathInventory, deathMessage)) {
             event.isCanceled = true
         }
     }
 
-    fun World.spawnGrave(pos: BlockPos, drops: List<ItemStack>, deathMessage: IChatComponent?): Boolean {
+    fun World.spawnGrave(pos: BlockPos, drops: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
         val blockHardness = getBlockState(pos).block.getBlockHardness(this, pos)
         if (blockHardness < 0)
             return false
 
         setBlockState(pos, BlockGrave.defaultState, 3)
-        val tileEntity = getTileEntity(pos) as TileEntityGrave?
-        return tileEntity?.takeDrops(drops, deathMessage) ?: false
+        val tileEntity = getTileEntity(pos) as TileEntityGrave? ?: return false
+        tileEntity.takeDrops(drops, deathMessage)
+        return true
     }
 
     fun Entity.findIdealGravePos(): BlockPos {

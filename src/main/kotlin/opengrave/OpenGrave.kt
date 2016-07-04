@@ -22,6 +22,6 @@ object OpenGrave {
         GameRegistry.registerBlock(BlockGrave)
         GameRegistry.registerTileEntity(TileEntityGrave::class.java, TileEntityGrave.ID)
         MinecraftForge.EVENT_BUS.register(DeathHandler)
-        debugPreInit(event)
+        debugPreInit()
     }
 }

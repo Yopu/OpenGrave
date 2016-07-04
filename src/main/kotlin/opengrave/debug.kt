@@ -6,7 +6,6 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_AIR
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import opengrave.DeathHandler.findIdealGravePos
 import opengrave.DeathHandler.spawnGrave
@@ -18,7 +17,7 @@ import java.util.logging.Logger
 
 val DEBUG_MODE = System.getenv("opengrave.debug")?.toBoolean() ?: false
 
-val debugLog = Logger.getAnonymousLogger().apply {
+val debugLog: Logger = Logger.getAnonymousLogger().apply {
     if (DEBUG_MODE) {
         level = Level.ALL
         val consoleHandler = ConsoleHandler()
@@ -29,7 +28,7 @@ val debugLog = Logger.getAnonymousLogger().apply {
     }
 }
 
-fun debugPreInit(event: FMLPreInitializationEvent?) {
+fun debugPreInit() {
     if (DEBUG_MODE) {
         MinecraftForge.EVENT_BUS.register(DebugClickHandler)
     }
@@ -40,13 +39,17 @@ object DebugClickHandler {
     @SubscribeEvent
     fun handleClick(event: PlayerInteractEvent?) {
         if (!DEBUG_MODE || event == null || event.world.isRemote) return
+        val entityPlayer = event.entityPlayer ?: return
+
         val rightClickingBlock = event.action == RIGHT_CLICK_BLOCK
         val rightClickingAir = event.action == RIGHT_CLICK_AIR
-        val crouching = event.entityPlayer.isSneaking
-        val usingStick = event.entityPlayer?.heldItem?.item == Items.stick
+
+        val crouching = entityPlayer.isSneaking
+        val usingStick = entityPlayer.heldItem?.item == Items.stick
+
         if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
-            val pos = event.entityPlayer?.findIdealGravePos() ?: event.pos
-            val drops = event.entityPlayer?.inventory?.run { armorInventory + mainInventory }.orEmpty().toList()
+            val pos = entityPlayer.findIdealGravePos()
+            val drops = entityPlayer.fullInventory
             event.world?.spawnGrave(pos, drops, ChatComponentText("DEBUG"))
         }
     }
