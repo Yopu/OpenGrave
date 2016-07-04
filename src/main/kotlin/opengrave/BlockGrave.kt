@@ -21,6 +21,13 @@ object BlockGrave : BlockContainer(Material.rock) {
         setBlockBounds(0.0625F, 0.0F, 0.375F, 0.9375F, 0.875F, 0.625F)
     }
 
+    override fun removedByPlayer(worldIn: World?, pos: BlockPos?, player: EntityPlayer?, willHarvest: Boolean): Boolean {
+        val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
+        if (player != null)
+            tileEntityGrave?.returnPlayerItems(player)
+        return super.removedByPlayer(worldIn, pos, player, willHarvest)
+    }
+
     override fun breakBlock(worldIn: World?, pos: BlockPos?, state: IBlockState?) {
         val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
         tileEntityGrave?.dropItems()

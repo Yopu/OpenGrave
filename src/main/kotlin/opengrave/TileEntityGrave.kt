@@ -1,5 +1,6 @@
 package opengrave
 
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.InventoryBasic
 import net.minecraft.inventory.InventoryHelper
@@ -19,7 +20,7 @@ class TileEntityGrave : TileEntity() {
         const val DEATH_MESSAGE_NBT_KEY = "death_message"
     }
 
-    var inventory = arrayOf<ItemStack?>()
+    var inventory: Array<ItemStack?> = emptyArray()
     var deathMessage: IChatComponent? = null
 
     private val inventoryWrapper: IInventory
@@ -33,6 +34,21 @@ class TileEntityGrave : TileEntity() {
     }
 
     fun dropItems() = InventoryHelper.dropInventoryItems(world, pos, inventoryWrapper)
+
+    fun returnPlayerItems(player: EntityPlayer) {
+        for ((index, itemStack) in inventory.withIndex()) {
+            if (itemStack == null) continue
+            val occupyingItem: ItemStack? = player.inventory.getStackInSlot(index)
+            if (occupyingItem == null) {
+                player.inventory.setInventorySlotContents(index, itemStack)
+            } else {
+                if (!player.inventory.addItemStackToInventory(itemStack)) {
+                    itemStack.dropInWorld(world, pos)
+                }
+            }
+        }
+        inventory = emptyArray()
+    }
 
     override fun readFromNBT(compound: NBTTagCompound?) {
         super.readFromNBT(compound)
