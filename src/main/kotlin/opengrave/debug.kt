@@ -15,7 +15,7 @@ import java.util.logging.ConsoleHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 
-val DEBUG_MODE = System.getenv("opengrave.debug")?.toBoolean() ?: false
+val DEBUG_MODE: Boolean = System.getProperty("opengrave.debug")?.toBoolean() ?: false
 
 val debugLog: Logger = Logger.getAnonymousLogger().apply {
     if (DEBUG_MODE) {

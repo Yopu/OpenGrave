@@ -41,6 +41,10 @@ minecraft {
     makeObfSourceJar = false
 }
 
+runClient {
+    systemProperty "opengrave.debug", "true"
+}
+
 repositories {
     mavenCentral()
 }
