@@ -15,7 +15,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DeathHandler {
 
-    var lastDeathInventory: Array<ItemStack?> = emptyArray()
+    var neighborSearchDepth: Int = 0
+    private var lastDeathInventory: Array<ItemStack?> = emptyArray()
 
     @SubscribeEvent
     fun handlePreDeath(event: LivingDeathEvent?) {
@@ -68,8 +69,7 @@ object DeathHandler {
             debugLog.finest("original position is already ideal")
             return pos
         }
-        val neighbors = pos.neighbors(1)
-        for (neighbor in neighbors) {
+        for (neighbor in pos.neighbors(neighborSearchDepth)) {
             if (isIdealGravePosition(neighbor))
                 return neighbor
         }

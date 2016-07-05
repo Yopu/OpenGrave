@@ -22,9 +22,9 @@ fun BlockPos.neighbors(offset: Int): List<BlockPos> {
         for (newY in (y - offset)..(y + offset)) {
             for (newZ in (z - offset)..(z + offset)) {
                 val newPos = BlockPos(newX, newY, newZ)
-                if (newPos !in positions) {
-                    positions += newPos
-                }
+                if (newPos == this)
+                    continue
+                positions += newPos
             }
         }
     }

@@ -1,6 +1,7 @@
 package opengrave
 
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.common.config.Configuration
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.Mod.InstanceFactory
@@ -17,8 +18,15 @@ object OpenGrave {
     fun instanceFactory() = this
 
     @EventHandler
-    fun preInit(event: FMLPreInitializationEvent?) {
+    fun preInit(event: FMLPreInitializationEvent) {
         debugLog.info("Opengrave preinit $event")
+
+        val config = Configuration(event.suggestedConfigurationFile)
+        DeathHandler.neighborSearchDepth = config.getInt("search_distance", "path_finding", 2, 0, 10,
+                "The search radius for a gravestone measured from the point of death.\n" +
+                        "Nota bene: search time increases polynomially with respect to the radius. O(n^3)")
+        config.save()
+
         GameRegistry.registerBlock(BlockGrave)
         GameRegistry.registerTileEntity(TileEntityGrave::class.java, TileEntityGrave.ID)
         MinecraftForge.EVENT_BUS.register(DeathHandler)
