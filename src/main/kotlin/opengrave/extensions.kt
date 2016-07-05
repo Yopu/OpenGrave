@@ -15,3 +15,18 @@ fun ItemStack.dropInWorld(world: World, pos: BlockPos) {
     throwawayInventory.setInventorySlotContents(0, this)
     InventoryHelper.dropInventoryItems(world, pos, throwawayInventory)
 }
+
+fun BlockPos.neighbors(offset: Int): List<BlockPos> {
+    val positions = mutableListOf<BlockPos>()
+    for (newX in (x - offset)..(x + offset)) {
+        for (newY in (y - offset)..(y + offset)) {
+            for (newZ in (z - offset)..(z + offset)) {
+                val newPos = BlockPos(newX, newY, newZ)
+                if (newPos !in positions) {
+                    positions += newPos
+                }
+            }
+        }
+    }
+    return positions
+}

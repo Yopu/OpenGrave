@@ -64,18 +64,16 @@ object DeathHandler {
 
     fun World.findNearestIdealGravePos(pos: BlockPos): BlockPos {
         debugLog.finest("finding nearest ideal grave pos $pos")
-        val stack = arrayListOf<BlockPos>()
-        stack += pos
-        while (stack.isNotEmpty()) {
-            val nextPos = stack.removeAt(0)
-            if (isIdealGravePosition(nextPos))
-                return nextPos
-            if (pos.distanceSq(nextPos) >= 10)
-                break
-            for (side in EnumFacing.VALUES)
-                stack += nextPos.offset(side)
+        if (isIdealGravePosition(pos)) {
+            debugLog.finest("original position is already ideal")
+            return pos
         }
-        debugLog.finest("couldn't find ideal, returning original $pos")
+        val neighbors = pos.neighbors(1)
+        for (neighbor in neighbors) {
+            if (isIdealGravePosition(neighbor))
+                return neighbor
+        }
+        debugLog.finest("couldn't find ideal, returning original")
         return pos
     }
 
