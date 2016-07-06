@@ -20,20 +20,26 @@ object DeathHandler {
     private var lastDeath: Pair<UUID, Array<ItemStack?>>? = null
 
     @SubscribeEvent
-    fun handlePreDeath(event: LivingDeathEvent?) {
-        val entity = event?.entity as? EntityPlayer ?: return
+    fun handlePreDeath(event: LivingDeathEvent) {
+        val entity = event.entity as? EntityPlayer ?: return
         lastDeath = entity.persistentID to entity.fullInventory
     }
 
     @SubscribeEvent
-    fun handleDeath(event: PlayerDropsEvent?) {
-        if (event == null) return
+    fun handleDeath(event: PlayerDropsEvent) {
         val entity = event.entity as? EntityPlayer? ?: return
         val world = entity.entityWorld
         if (world == null || world.isRemote) return
 
-        val (lastDeathPlayerID, lastDeathInventory) = lastDeath ?: throw IllegalStateException()
-        if (entity.persistentID != lastDeathPlayerID) throw IllegalStateException()
+        if (lastDeath == null) {
+            OpenGrave.modLog.error("GraveHandler's lastDeath uninitialized before handling a PlayerDropsEvent")
+            return
+        }
+        val (lastDeathPlayerID, lastDeathInventory) = lastDeath!!
+        if (entity.persistentID != lastDeathPlayerID) {
+            OpenGrave.modLog.error("GraveHandler handled a PlayerDropsEvent from the incorrect player")
+            return
+        }
 
         debugLog.finest("handling $event")
         val pos = entity.findIdealGravePos()

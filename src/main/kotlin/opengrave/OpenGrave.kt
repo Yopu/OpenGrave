@@ -7,11 +7,14 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.Mod.InstanceFactory
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.registry.GameRegistry
+import org.apache.logging.log4j.Logger
 
 const val MODID = "opengrave"
 
 @Mod(modid = MODID, modLanguage = "Kotlin")
 object OpenGrave {
+
+    lateinit var modLog: Logger
 
     @JvmStatic
     @InstanceFactory
@@ -20,6 +23,7 @@ object OpenGrave {
     @EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         debugLog.info("Opengrave preinit $event")
+        this.modLog = event.modLog
 
         val config = Configuration(event.suggestedConfigurationFile)
         DeathHandler.neighborSearchDepth = config.getInt("search_distance", "path_finding", 2, 0, 10,
