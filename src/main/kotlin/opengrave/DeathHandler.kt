@@ -17,6 +17,7 @@ import java.util.*
 object DeathHandler {
 
     var neighborSearchDepth: Int = 0
+    var groundSearchDistance: Double = 0.0
     private var lastDeath: Pair<UUID, Array<ItemStack?>>? = null
 
     @SubscribeEvent
@@ -63,6 +64,7 @@ object DeathHandler {
 
     fun Entity.findIdealGravePos(): BlockPos {
         Debug.log.finest("finding ideal grave pos")
+
         if (worldObj.isLiquidBlock(position)) {
             val possibleFloatingPosition = worldObj.findFloatingPosition(position)
             if (possibleFloatingPosition != null) {
@@ -70,7 +72,24 @@ object DeathHandler {
                 return possibleFloatingPosition
             }
         }
-        return Debug.time { worldObj.findNearestIdealGravePos(position) }
+
+        val nearestGroundPos = Debug.time("findNearestGroundPos") { findNearestGroundPos(groundSearchDistance) }
+        if (nearestGroundPos != null)
+            return nearestGroundPos
+
+        return Debug.time("findNearestIdealGravePos") { worldObj.findNearestIdealGravePos(position) }
+    }
+
+    fun Entity.findNearestGroundPos(searchDistance: Double): BlockPos? {
+        Debug.log.finest("Finding nearest ground position")
+        val searchDistanceSQ = searchDistance * searchDistance
+        val (groundPos, groundPosDistanceSQ) = MovementHandler.closestGroundPosition(this) ?: return null
+        if (groundPosDistanceSQ <= searchDistanceSQ) {
+            Debug.log.finest("Found a potential grave position from the MovementHandler")
+            return groundPos
+        }
+        Debug.log.finest("Closest grave is out of range: found:$groundPosDistanceSQ > required:$searchDistanceSQ")
+        return null
     }
 
     fun World.findNearestIdealGravePos(pos: BlockPos): BlockPos {

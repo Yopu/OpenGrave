@@ -57,17 +57,17 @@ object Debug {
         }
     }
 
-    fun <T> time(logger: Logger = log, func: () -> T): T {
-        var result: T? = null
-        val duration = duration { result = func() }
-        logger.finest("Duration of ${duration.toMillis()}ms")
-        return result!!
+    fun <T> time(notation: String? = null, logger: Logger = log, func: () -> T): T {
+        val (result, duration) = duration { func() }
+        val prefix = if (notation != null) "$notation has a duration" else "Duration"
+        logger.finest("$prefix of ${duration.toMillis()}ms")
+        return result
     }
 
-    fun duration(func: () -> Unit): Duration {
+    fun <T> duration(func: () -> T): Pair<T, Duration> {
         val start = Instant.now()
-        func()
+        val result = func()
         val end = Instant.now()
-        return Duration.between(start, end)
+        return result to Duration.between(start, end)
     }
 }

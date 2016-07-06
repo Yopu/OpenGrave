@@ -29,11 +29,14 @@ object OpenGrave {
         DeathHandler.neighborSearchDepth = config.getInt("search_distance", "path_finding", 2, 0, 10,
                 "The search radius for a gravestone measured from the point of death.\n" +
                         "Nota bene: search time increases polynomially with respect to the radius. O(n^3)")
+        DeathHandler.groundSearchDistance = config.getFloat("ground_distance", "path_finding", 10f, 0f, 20f,
+                "The distance which a gravestone will spawn from the last cached player ground position.").toDouble()
         config.save()
 
         GameRegistry.registerBlock(BlockGrave)
         GameRegistry.registerTileEntity(TileEntityGrave::class.java, TileEntityGrave.ID)
         MinecraftForge.EVENT_BUS.register(DeathHandler)
+        MinecraftForge.EVENT_BUS.register(MovementHandler)
         Debug.preInit()
     }
 }
