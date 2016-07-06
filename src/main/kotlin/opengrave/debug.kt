@@ -15,56 +15,59 @@ import java.util.logging.ConsoleHandler
 import java.util.logging.Level
 import java.util.logging.Logger
 
-val DEBUG_MODE: Boolean = System.getProperty("opengrave.debug")?.toBoolean() ?: false
+object Debug {
 
-val debugLog: Logger = Logger.getAnonymousLogger().apply {
-    if (DEBUG_MODE) {
-        level = Level.ALL
-        val consoleHandler = ConsoleHandler()
-        consoleHandler.level = level
-        addHandler(consoleHandler)
-    } else {
-        level = Level.OFF
-    }
-}
+    private val enabled: Boolean = System.getProperty("opengrave.debug")?.toBoolean() ?: false
 
-fun debugPreInit() {
-    if (DEBUG_MODE) {
-        MinecraftForge.EVENT_BUS.register(DebugClickHandler)
-    }
-}
-
-object DebugClickHandler {
-
-    @SubscribeEvent
-    fun handleClick(event: PlayerInteractEvent?) {
-        if (!DEBUG_MODE || event == null || event.world.isRemote) return
-        val entityPlayer = event.entityPlayer ?: return
-
-        val rightClickingBlock = event.action == RIGHT_CLICK_BLOCK
-        val rightClickingAir = event.action == RIGHT_CLICK_AIR
-
-        val crouching = entityPlayer.isSneaking
-        val usingStick = entityPlayer.heldItem?.item == Items.stick
-
-        if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
-            val pos = entityPlayer.findIdealGravePos()
-            val drops = entityPlayer.fullInventory
-            event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, ChatComponentText("DEBUG"))
+    val log: Logger = Logger.getAnonymousLogger().apply {
+        if (enabled) {
+            level = Level.ALL
+            val consoleHandler = ConsoleHandler()
+            consoleHandler.level = level
+            addHandler(consoleHandler)
+        } else {
+            level = Level.OFF
         }
     }
-}
 
-fun <T> time(logger: Logger = debugLog, func: () -> T): T {
-    var result: T? = null
-    val duration = duration { result = func() }
-    logger.finest("Duration of ${duration.toMillis()}ms")
-    return result!!
-}
+    fun preInit() {
+        if (enabled) {
+            MinecraftForge.EVENT_BUS.register(DebugClickHandler)
+        }
+    }
 
-fun duration(func: () -> Unit): Duration {
-    val start = Instant.now()
-    func()
-    val end = Instant.now()
-    return Duration.between(start, end)
+    object DebugClickHandler {
+
+        @SubscribeEvent
+        fun handleClick(event: PlayerInteractEvent?) {
+            if (!enabled || event == null || event.world.isRemote) return
+            val entityPlayer = event.entityPlayer ?: return
+
+            val rightClickingBlock = event.action == RIGHT_CLICK_BLOCK
+            val rightClickingAir = event.action == RIGHT_CLICK_AIR
+
+            val crouching = entityPlayer.isSneaking
+            val usingStick = entityPlayer.heldItem?.item == Items.stick
+
+            if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
+                val pos = entityPlayer.findIdealGravePos()
+                val drops = entityPlayer.fullInventory
+                event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, ChatComponentText("DEBUG"))
+            }
+        }
+    }
+
+    fun <T> time(logger: Logger = log, func: () -> T): T {
+        var result: T? = null
+        val duration = duration { result = func() }
+        logger.finest("Duration of ${duration.toMillis()}ms")
+        return result!!
+    }
+
+    fun duration(func: () -> Unit): Duration {
+        val start = Instant.now()
+        func()
+        val end = Instant.now()
+        return Duration.between(start, end)
+    }
 }

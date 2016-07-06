@@ -14,7 +14,7 @@ const val MODID = "opengrave"
 @Mod(modid = MODID, modLanguage = "Kotlin")
 object OpenGrave {
 
-    lateinit var modLog: Logger
+    lateinit var log: Logger
 
     @JvmStatic
     @InstanceFactory
@@ -22,8 +22,8 @@ object OpenGrave {
 
     @EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
-        debugLog.info("Opengrave preinit $event")
-        this.modLog = event.modLog
+        Debug.log.info("Opengrave preinit $event")
+        this.log = event.modLog
 
         val config = Configuration(event.suggestedConfigurationFile)
         DeathHandler.neighborSearchDepth = config.getInt("search_distance", "path_finding", 2, 0, 10,
@@ -34,6 +34,6 @@ object OpenGrave {
         GameRegistry.registerBlock(BlockGrave)
         GameRegistry.registerTileEntity(TileEntityGrave::class.java, TileEntityGrave.ID)
         MinecraftForge.EVENT_BUS.register(DeathHandler)
-        debugPreInit()
+        Debug.preInit()
     }
 }

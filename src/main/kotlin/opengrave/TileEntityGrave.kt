@@ -69,7 +69,7 @@ class TileEntityGrave : TileEntity() {
 
         val tagList = rootTagCompound?.getTagList(INVENTORY_NBT_KEY, NBTBase.NBT_TYPES.indexOf("COMPOUND"))
         if (tagList == null) {
-            debugLog.severe("$this unable to read from nbt!")
+            OpenGrave.log.error("$this unable to read from nbt!")
             return
         }
         for (i in 0..tagList.tagCount()) {
@@ -98,7 +98,7 @@ class TileEntityGrave : TileEntity() {
         val tagList = NBTTagList()
         inventory.map { it?.serializeNBT() }.filterNotNull().forEach { tagList.appendTag(it) }
         rootTagCompound.setTag(INVENTORY_NBT_KEY, tagList)
-        compound?.setTag(ID, rootTagCompound) ?: debugLog.severe("$this unable to write to nbt!")
+        compound?.setTag(ID, rootTagCompound) ?: OpenGrave.log.error("$this unable to write to nbt!")
 
         val entityPlayerIDString = entityPlayerID?.toString()
         if (entityPlayerIDString != null) {
