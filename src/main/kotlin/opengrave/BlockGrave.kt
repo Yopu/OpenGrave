@@ -22,6 +22,8 @@ object BlockGrave : BlockContainer(Material.rock) {
     }
 
     override fun removedByPlayer(worldIn: World?, pos: BlockPos?, player: EntityPlayer?, willHarvest: Boolean): Boolean {
+        if (worldIn?.isRemote ?: true)
+            return super.removedByPlayer(worldIn, pos, player, willHarvest)
         val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
         if (player != null)
             tileEntityGrave?.returnPlayerItems(player)

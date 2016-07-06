@@ -40,7 +40,7 @@ class TileEntityGrave : TileEntity() {
     fun dropItems() = InventoryHelper.dropInventoryItems(world, pos, inventoryWrapper)
 
     fun returnPlayerItems(player: EntityPlayer) {
-        if (player.persistentID == entityPlayerID)
+        if (player.persistentID != entityPlayerID)
             return
 
         for ((index, itemStack) in inventory.withIndex()) {
