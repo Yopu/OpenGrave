@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.IChatComponent.Serializer
+import java.util.*
 
 class TileEntityGrave : TileEntity() {
 
@@ -18,8 +19,10 @@ class TileEntityGrave : TileEntity() {
         const val ID = "opengrave.tileentitygrave"
         const val INVENTORY_NBT_KEY = "inventory"
         const val DEATH_MESSAGE_NBT_KEY = "death_message"
+        const val ENTITY_PLAYER_ID_NBT_KEY = "entity_player_id"
     }
 
+    var entityPlayerID: UUID? = null
     var inventory: Array<ItemStack?> = emptyArray()
     var deathMessage: IChatComponent? = null
 
@@ -28,17 +31,23 @@ class TileEntityGrave : TileEntity() {
             inventory.forEachIndexed { i, stack -> setInventorySlotContents(i, stack) }
         }
 
-    fun takeDrops(items: Array<ItemStack?>, deathMessage: IChatComponent?) {
+    fun takeDrops(entityPlayerID: UUID, items: Array<ItemStack?>, deathMessage: IChatComponent?) {
+        this.entityPlayerID = entityPlayerID
+        this.inventory = items
         this.deathMessage = deathMessage
-        inventory = items
     }
 
     fun dropItems() = InventoryHelper.dropInventoryItems(world, pos, inventoryWrapper)
 
     fun returnPlayerItems(player: EntityPlayer) {
+        if (player.persistentID == entityPlayerID)
+            return
+
         for ((index, itemStack) in inventory.withIndex()) {
-            if (itemStack == null) continue
-            val occupyingItem: ItemStack? = player.inventory.getStackInSlot(index)
+            if (itemStack == null)
+                continue
+
+            val occupyingItem = player.inventory.getStackInSlot(index)
             if (occupyingItem == null) {
                 player.inventory.setInventorySlotContents(index, itemStack)
             } else {
@@ -47,6 +56,7 @@ class TileEntityGrave : TileEntity() {
                 }
             }
         }
+
         inventory = emptyArray()
     }
 
@@ -67,6 +77,15 @@ class TileEntityGrave : TileEntity() {
             val stack = ItemStack.loadItemStackFromNBT(nbt) ?: continue
             inventory += stack
         }
+
+        val entityPlayerIDString = rootTagCompound?.getString(ENTITY_PLAYER_ID_NBT_KEY)
+        if (!entityPlayerIDString.isNullOrBlank()) {
+            try {
+                entityPlayerID = UUID.fromString(entityPlayerIDString)
+            } catch (e: IllegalArgumentException) {
+                entityPlayerID = null
+            }
+        }
     }
 
     override fun writeToNBT(compound: NBTTagCompound?) {
@@ -80,6 +99,11 @@ class TileEntityGrave : TileEntity() {
         inventory.map { it?.serializeNBT() }.filterNotNull().forEach { tagList.appendTag(it) }
         rootTagCompound.setTag(INVENTORY_NBT_KEY, tagList)
         compound?.setTag(ID, rootTagCompound) ?: debugLog.severe("$this unable to write to nbt!")
+
+        val entityPlayerIDString = entityPlayerID?.toString()
+        if (entityPlayerIDString != null) {
+            rootTagCompound.setString(ENTITY_PLAYER_ID_NBT_KEY, entityPlayerIDString)
+        }
     }
 
     override fun toString() = "TileEntityGrave@$pos"

@@ -12,16 +12,17 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
 import net.minecraftforge.fluids.IFluidBlock
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 
 object DeathHandler {
 
     var neighborSearchDepth: Int = 0
-    private var lastDeathInventory: Array<ItemStack?> = emptyArray()
+    private var lastDeath: Pair<UUID, Array<ItemStack?>>? = null
 
     @SubscribeEvent
     fun handlePreDeath(event: LivingDeathEvent?) {
         val entity = event?.entity as? EntityPlayer ?: return
-        lastDeathInventory = entity.fullInventory
+        lastDeath = entity.persistentID to entity.fullInventory
     }
 
     @SubscribeEvent
@@ -31,23 +32,26 @@ object DeathHandler {
         val world = entity.entityWorld
         if (world == null || world.isRemote) return
 
+        val (lastDeathPlayerID, lastDeathInventory) = lastDeath ?: throw IllegalStateException()
+        if (entity.persistentID != lastDeathPlayerID) throw IllegalStateException()
+
         debugLog.finest("handling $event")
         val pos = entity.findIdealGravePos()
         debugLog.finest("using $pos")
         val deathMessage = event.source?.getDeathMessage(entity)
-        if (world.spawnGrave(pos, lastDeathInventory, deathMessage)) {
+        if (world.spawnGrave(pos, lastDeathPlayerID, lastDeathInventory, deathMessage)) {
             event.isCanceled = true
         }
     }
 
-    fun World.spawnGrave(pos: BlockPos, drops: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
+    fun World.spawnGrave(pos: BlockPos, entityPlayerID: UUID, drops: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
         val blockHardness = getBlockState(pos).block.getBlockHardness(this, pos)
         if (blockHardness < 0)
             return false
 
         setBlockState(pos, BlockGrave.defaultState, 3)
         val tileEntity = getTileEntity(pos) as TileEntityGrave? ?: return false
-        tileEntity.takeDrops(drops, deathMessage)
+        tileEntity.takeDrops(entityPlayerID, drops, deathMessage)
         return true
     }
 
