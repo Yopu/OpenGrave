@@ -50,7 +50,7 @@ object DebugClickHandler {
         if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
             val pos = entityPlayer.findIdealGravePos()
             val drops = entityPlayer.fullInventory
-            event.world?.spawnGrave(pos, drops, ChatComponentText("DEBUG"))
+            event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, ChatComponentText("DEBUG"))
         }
     }
 }
