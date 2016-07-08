@@ -46,19 +46,21 @@ object DeathHandler {
         val pos = entity.findIdealGravePos()
         Debug.log.finest("using $pos")
         val deathMessage = event.source?.getDeathMessage(entity)
-        if (world.spawnGrave(pos, lastDeathPlayerID, lastDeathInventory, deathMessage)) {
+        val baubles = getBaublesArray(entity)
+        if (world.spawnGrave(pos, lastDeathPlayerID, lastDeathInventory, baubles, deathMessage)) {
+            safeGetBaubles(entity)?.clear()
             event.isCanceled = true
         }
     }
 
-    fun World.spawnGrave(pos: BlockPos, entityPlayerID: UUID, drops: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
+    fun World.spawnGrave(pos: BlockPos, entityPlayerID: UUID, drops: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
         val blockHardness = getBlockState(pos).block.getBlockHardness(this, pos)
         if (blockHardness < 0)
             return false
 
         setBlockState(pos, BlockGrave.defaultState, 3)
         val tileEntity = getTileEntity(pos) as TileEntityGrave? ?: return false
-        tileEntity.takeDrops(entityPlayerID, drops, deathMessage)
+        tileEntity.takeDrops(entityPlayerID, drops, baubles, deathMessage)
         return true
     }
 

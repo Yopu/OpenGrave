@@ -88,12 +88,3 @@ shadowJar {
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
 }
-
-task cleanSSP(type: Delete) {
-    delete fileTree(dir: testWorldDir, include: 'OpenGrave-*.jar')
-}
-
-task copyToSSP(type: Copy, dependsOn: cleanSSP) {
-    from tasks.jar.archivePath
-    into testWorldDir
-}
