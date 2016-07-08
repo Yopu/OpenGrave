@@ -52,7 +52,7 @@ object Debug {
             if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
                 val pos = entityPlayer.findIdealGravePos()
                 val drops = entityPlayer.fullInventory
-                event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, getBaublesArray(entityPlayer), ChatComponentText("DEBUG"))
+                event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, entityPlayer.getBaublesArray(), ChatComponentText("DEBUG"))
             }
         }
     }

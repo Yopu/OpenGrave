@@ -18,12 +18,12 @@ object DeathHandler {
 
     var neighborSearchDepth: Int = 0
     var groundSearchDistance: Double = 0.0
-    private var lastDeath: Pair<UUID, Array<ItemStack?>>? = null
+    private var lastDeath: Triple<UUID, Array<ItemStack?>, Array<ItemStack?>>? = null
 
     @SubscribeEvent
     fun handlePreDeath(event: LivingDeathEvent) {
         val entity = event.entity as? EntityPlayer ?: return
-        lastDeath = entity.persistentID to entity.fullInventory
+        lastDeath = Triple(entity.persistentID, entity.fullInventory, entity.getBaublesArray())
     }
 
     @SubscribeEvent
@@ -36,7 +36,7 @@ object DeathHandler {
             OpenGrave.log.error("GraveHandler's lastDeath uninitialized before handling a PlayerDropsEvent")
             return
         }
-        val (lastDeathPlayerID, lastDeathInventory) = lastDeath!!
+        val (lastDeathPlayerID, lastDeathInventory, lastDeathBaubles) = lastDeath!!
         if (entity.persistentID != lastDeathPlayerID) {
             OpenGrave.log.error("GraveHandler handled a PlayerDropsEvent from the incorrect player")
             return
@@ -46,9 +46,7 @@ object DeathHandler {
         val pos = entity.findIdealGravePos()
         Debug.log.finest("using $pos")
         val deathMessage = event.source?.getDeathMessage(entity)
-        val baubles = getBaublesArray(entity)
-        if (world.spawnGrave(pos, lastDeathPlayerID, lastDeathInventory, baubles, deathMessage)) {
-            safeGetBaubles(entity)?.clear()
+        if (world.spawnGrave(pos, lastDeathPlayerID, lastDeathInventory, lastDeathBaubles, deathMessage)) {
             event.isCanceled = true
         }
     }

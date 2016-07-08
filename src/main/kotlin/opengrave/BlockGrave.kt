@@ -38,7 +38,12 @@ object BlockGrave : BlockContainer(Material.rock) {
 
     override fun onBlockActivated(worldIn: World?, pos: BlockPos?, state: IBlockState?, playerIn: EntityPlayer?, side: EnumFacing?, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
-        tileEntityGrave?.deathMessage?.let { playerIn?.addChatMessage(it) }
+        if (tileEntityGrave != null) {
+            Debug.log.finest("${tileEntityGrave.entityPlayerID}\tInventory:\t${tileEntityGrave.inventory.joinToString()}")
+            Debug.log.finest("${tileEntityGrave.entityPlayerID}\tBaubles:\t${tileEntityGrave.baubles.joinToString()}")
+
+            tileEntityGrave.deathMessage?.let { playerIn?.addChatMessage(it) }
+        }
         return false
     }
 

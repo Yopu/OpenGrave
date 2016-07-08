@@ -33,18 +33,21 @@ fun BlockPos.neighbors(offset: Int): List<BlockPos> {
     return positions
 }
 
-fun safeGetBaubles(entityPlayer: EntityPlayer): IInventory? {
+fun EntityPlayer.safeGetBaubles(): IInventory? {
     try {
-        return BaublesApi.getBaubles(entityPlayer)
+        val inventory = BaublesApi.getBaubles(this)
+        Debug.log.finest("Received baubles $inventory for $this.")
+        return inventory
     } catch (e: NoClassDefFoundError) {
+        Debug.log.finest("Baubles API not present when retrieving $this's baubles!")
         return null
     }
 }
 
-fun getBaublesArray(entityPlayer: EntityPlayer): Array<ItemStack?> {
-    val inventory = safeGetBaubles(entityPlayer) ?: return emptyArray()
+fun EntityPlayer.getBaublesArray(): Array<ItemStack?> {
+    val inventory = safeGetBaubles() ?: return emptyArray()
     val itemStackList = mutableListOf<ItemStack?>()
-    for (i in 0..inventory.sizeInventory) {
+    for (i in 0..inventory.sizeInventory - 1) {
         itemStackList += inventory.getStackInSlot(i)
     }
     return itemStackList.toTypedArray()

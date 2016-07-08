@@ -47,7 +47,7 @@ class TileEntityGrave : TileEntity() {
         player.inventory.dispenseItems(inventory)
         inventory = emptyArray()
 
-        val baublesInventory = safeGetBaubles(player)
+        val baublesInventory = player.safeGetBaubles()
         if (baublesInventory != null) {
             baublesInventory.dispenseItems(baubles)
             baubles = emptyArray()
