@@ -15,7 +15,6 @@ fun NBTTagCompound.getItemStackArray(key: String): Array<ItemStack?> {
         val nbtTagCompound = tagList.getCompoundTagAt(i)
         val slot = nbtTagCompound.getInteger("slot")
         val itemStack = ItemStack.loadItemStackFromNBT(nbtTagCompound)
-        println("i:$i\tslot:$slot\tstack:$itemStack")
         itemStackList[slot] = itemStack
     }
     return itemStackList
