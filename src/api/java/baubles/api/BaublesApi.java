@@ -1,35 +1,47 @@
 package baubles.api;
 
+import baubles.api.cap.BaublesCapabilities;
+import baubles.api.cap.IBaublesItemHandler;
+import baubles.api.inv.BaublesInventoryWrapper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraftforge.fml.common.FMLLog;
-
-import java.lang.reflect.Method;
+import net.minecraft.item.Item;
 
 /**
  * @author Azanor
  */
-public class BaublesApi {
-    static Method getBaubles;
+public class BaublesApi
+{
+	/**
+	 * Retrieves the baubles inventory capability handler for the supplied player
+	 */
+	public static IBaublesItemHandler getBaublesHandler(EntityPlayer player)
+	{
+		IBaublesItemHandler handler = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+		handler.setPlayer(player);
+		return handler;
+	}
 
-    /**
-     * Retrieves the baubles inventory for the supplied player
-     */
-    public static IInventory getBaubles(EntityPlayer player) {
-        IInventory ot = null;
-
-        try {
-            if (getBaubles == null) {
-                Class<?> fake = Class.forName("baubles.common.lib.PlayerHandler");
-                getBaubles = fake.getMethod("getPlayerBaubles", EntityPlayer.class);
-            }
-
-            ot = (IInventory) getBaubles.invoke(null, player);
-        } catch (Exception ex) {
-            FMLLog.warning("[Baubles API] Could not invoke baubles.common.lib.PlayerHandler method getPlayerBaubles");
-        }
-
-        return ot;
-    }
-
+	/**
+	 * Retrieves the baubles capability handler wrapped as a IInventory for the supplied player
+	 */
+	@Deprecated
+	public static IInventory getBaubles(EntityPlayer player)
+	{
+		IBaublesItemHandler handler = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null);
+		handler.setPlayer(player);
+		return new BaublesInventoryWrapper(handler, player);
+	}
+	
+	/**
+	 * Returns if the passed in item is equipped in a bauble slot. Will return the first slot found
+	 * @return -1 if not found and slot number if it is found 
+	 */
+	public static int isBaubleEquipped(EntityPlayer player, Item bauble) {
+		IBaublesItemHandler handler = getBaublesHandler(player);
+		for (int a=0;a<handler.getSlots();a++) {
+			if (!handler.getStackInSlot(a).isEmpty() && handler.getStackInSlot(a).getItem()==bauble) return a;
+		}
+		return -1;
+	}
 }
