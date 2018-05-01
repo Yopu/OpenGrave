@@ -18,7 +18,7 @@ apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = '1.12.2-2.1'
+version = '1.12.2-3.0'
 group = 'yopu.opengrave'
 archivesBaseName = 'OpenGrave'
 
