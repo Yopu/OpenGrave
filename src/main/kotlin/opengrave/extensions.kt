@@ -47,14 +47,12 @@ fun EntityPlayer.safeGetBaubles(): IInventory? {
         handler.setPlayer(this)
         Debug.log.finest("Received baubles $inventory for $this.")
         return BaublesInventoryWrapper(handler, this)
-    } catch (e: Exception) {
-        when (e) {
-            is NoClassDefFoundError, is CapabilityError -> {
-                Debug.log.finest("Baubles API not present when retrieving $this's baubles!")
-            }
-        }
-        return null
+    } catch (e: NoClassDefFoundError) {
+        Debug.log.finest("Baubles API not present when retrieving $this's baubles!")
+    } catch (e: CapabilityError) {
+        Debug.log.finest("Capability returned null when retrieving $this's baubles!")
     }
+    return null
 }
 
 fun EntityPlayer.getBaublesArray(): Array<ItemStack?> {

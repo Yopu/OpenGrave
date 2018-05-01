@@ -18,7 +18,10 @@ apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = '1.12.2-3.0'
+def mcversion = '1.12.2'
+def forgeversion = '14.23.3.2655'
+
+version = "$mcversion-3.0"
 group = 'yopu.opengrave'
 archivesBaseName = 'OpenGrave'
 
@@ -33,7 +36,7 @@ configurations {
 }
 
 minecraft {
-    version = "1.12.2-14.23.3.2655"
+    version = "$mcversion-$forgeversion"
     runDir = "run"
     mappings = "snapshot_20180501"
 }
