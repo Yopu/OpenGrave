@@ -27,7 +27,13 @@ class TileEntityGrave : TileEntity() {
 
     private val inventoryWrapper: IInventory
         get() = InventoryBasic("throwaway", false, inventory.size + baubles.size).apply {
-            (inventory + baubles).forEachIndexed { i, stack -> setInventorySlotContents(i, stack) }
+            (inventory + baubles).forEachIndexed { i, stack ->
+                if (stack == null) {
+                    setInventorySlotContents(i, ItemStack.EMPTY)
+                } else {
+                    setInventorySlotContents(i, stack)
+                }
+            }
         }
 
     fun takeDrops(entityPlayerID: UUID, items: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: ITextComponent?) {
@@ -61,7 +67,7 @@ class TileEntityGrave : TileEntity() {
             var dispensed = false
             var possibleIndex = index
             while (possibleIndex < sizeInventory) {
-                if (getStackInSlot(possibleIndex) == null && isItemValidForSlot(possibleIndex, itemStack)) {
+                if (getStackInSlot(possibleIndex).isEmpty && isItemValidForSlot(possibleIndex, itemStack)) {
                     setInventorySlotContents(index, itemStack)
                     dispensed = true
                     break
@@ -74,39 +80,30 @@ class TileEntityGrave : TileEntity() {
         }
     }
 
-    override fun readFromNBT(compound: NBTTagCompound?) {
+    override fun readFromNBT(compound: NBTTagCompound) {
         super.readFromNBT(compound)
-        val rootTagCompound = compound?.getCompoundTag(ID)
+        val rootTagCompound = compound.getCompoundTag(ID)
 
-        val entityPlayerIDString = rootTagCompound?.getString(ENTITY_PLAYER_ID_NBT_KEY)
+        val entityPlayerIDString = rootTagCompound.getString(ENTITY_PLAYER_ID_NBT_KEY)
         if (!entityPlayerIDString.isNullOrBlank()) {
-            try {
-                entityPlayerID = UUID.fromString(entityPlayerIDString)
+            entityPlayerID = try {
+                UUID.fromString(entityPlayerIDString)
             } catch (e: IllegalArgumentException) {
-                entityPlayerID = null
+                null
             }
         }
 
-        val readItemStackArray = rootTagCompound?.getItemStackArray(INVENTORY_NBT_KEY)
-        if (readItemStackArray != null) {
-            inventory = readItemStackArray
-        } else {
-            OpenGrave.log.error("$this unable to read inventory from nbt!")
-        }
+        inventory = rootTagCompound.getItemStackArray(INVENTORY_NBT_KEY)
+        baubles = rootTagCompound.getItemStackArray(BAUBLES_NBT_KEY)
 
-        val readBaubles = rootTagCompound?.getItemStackArray(BAUBLES_NBT_KEY)
-        if (readBaubles != null) {
-            baubles = readBaubles
-        } else {
-            OpenGrave.log.error("$this unable to read baubles from nbt!")
+        val json = rootTagCompound.getString(DEATH_MESSAGE_NBT_KEY)
+        if (json.isNotBlank()) {
+            deathMessage = ITextComponent.Serializer.jsonToComponent(json)
         }
-
-        val json = rootTagCompound?.getString(DEATH_MESSAGE_NBT_KEY).orEmpty()
-        deathMessage = ITextComponent.Serializer.jsonToComponent(json)
     }
 
-    override fun serializeNBT(): NBTTagCompound {
-        val compound = super.serializeNBT()
+    override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
+        super.writeToNBT(compound)
         val rootTagCompound = NBTTagCompound()
 
         val entityPlayerIDString = entityPlayerID?.toString() ?: ""
@@ -116,8 +113,10 @@ class TileEntityGrave : TileEntity() {
 
         rootTagCompound.setTag(BAUBLES_NBT_KEY, baubles.toNBTTag())
 
-        val deathMessageJson = ITextComponent.Serializer.componentToJson(deathMessage)
-        rootTagCompound.setString(DEATH_MESSAGE_NBT_KEY, deathMessageJson)
+        deathMessage?.let {
+            val deathMessageJson = ITextComponent.Serializer.componentToJson(it)
+            rootTagCompound.setString(DEATH_MESSAGE_NBT_KEY, deathMessageJson)
+        }
 
         compound.setTag(ID, rootTagCompound)
 
