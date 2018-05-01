@@ -42,7 +42,10 @@ object BlockGrave : BlockContainer(Material.ROCK) {
     }
 
     override fun onBlockActivated(worldIn: World?, pos: BlockPos?, state: IBlockState?, playerIn: EntityPlayer?, hand: EnumHand?, side: EnumFacing?, hitX: Float, hitY: Float, hitZ: Float): Boolean {
-        val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
+        if (worldIn == null || pos == null || hand == null || worldIn.isRemote || hand != EnumHand.MAIN_HAND) {
+            return false
+        }
+        val tileEntityGrave = worldIn.getTileEntity(pos) as? TileEntityGrave?
         if (tileEntityGrave != null) {
             Debug.log.finest("${tileEntityGrave.entityPlayerID}\tInventory:\t${tileEntityGrave.inventory.joinToString()}")
             Debug.log.finest("${tileEntityGrave.entityPlayerID}\tBaubles:\t${tileEntityGrave.baubles.joinToString()}")
