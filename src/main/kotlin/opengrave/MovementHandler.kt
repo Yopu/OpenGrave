@@ -2,7 +2,7 @@ package opengrave
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.BlockPos
+import net.minecraft.util.math.BlockPos
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import opengrave.DeathHandler.isIdealGravePosition
@@ -29,7 +29,7 @@ object MovementHandler {
     }
 
     fun closestGroundPosition(player: Entity): Pair<BlockPos, Double>? {
-        val world = player.worldObj
+        val world = player.world
         val potentialGroundPos = MovementHandler.positionMap[player.persistentID] ?: return null
         if (world.isIdealGravePosition(potentialGroundPos))
             return potentialGroundPos to potentialGroundPos.distanceSq(player.position)

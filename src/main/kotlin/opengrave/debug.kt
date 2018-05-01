@@ -1,11 +1,9 @@
 package opengrave
 
 import net.minecraft.init.Items
-import net.minecraft.util.ChatComponentText
+import net.minecraft.util.text.TextComponentString
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_AIR
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import opengrave.DeathHandler.findIdealGravePos
 import opengrave.DeathHandler.spawnGrave
@@ -43,16 +41,17 @@ object Debug {
             if (!enabled || event == null || event.world.isRemote) return
             val entityPlayer = event.entityPlayer ?: return
 
-            val rightClickingBlock = event.action == RIGHT_CLICK_BLOCK
-            val rightClickingAir = event.action == RIGHT_CLICK_AIR
+
+            val rightClickingBlock = event is PlayerInteractEvent.RightClickBlock
+            val rightClickingAir = event is PlayerInteractEvent.RightClickEmpty
 
             val crouching = entityPlayer.isSneaking
-            val usingStick = entityPlayer.heldItem?.item == Items.stick
+            val usingStick = entityPlayer.heldItemMainhand?.item == Items.STICK
 
             if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
                 val pos = entityPlayer.findIdealGravePos()
                 val drops = entityPlayer.fullInventory
-                event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, entityPlayer.getBaublesArray(), ChatComponentText("DEBUG"))
+                event.world?.spawnGrave(pos, entityPlayer.persistentID, drops, entityPlayer.getBaublesArray(), TextComponentString("DEBUG"))
             }
         }
     }

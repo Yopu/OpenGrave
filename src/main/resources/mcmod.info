@@ -1,6 +1,5 @@
+[
 {
-  "modListVersion": 2,
-  "modList": [{
     "modid": "opengrave",
     "name": "Open Grave",
     "description": "The simple gravestone mod.",
@@ -11,11 +10,7 @@
     "authorList": [ "yopu" ],
     "credits": "Made by yopu.\nSpecial thanks to everyone on IRC.",
     "logoFile": "",
-    "screenshots": [  ],
-    "parent": "",
-    "requiredMods": [ "Forge" ],
-    "dependencies": [  ],
-    "dependants": [  ],
-    "useDependencyInformation": true
-  }]
+    "screenshots": [],
+    "dependencies": []
 }
+]

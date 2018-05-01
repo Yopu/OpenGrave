@@ -4,9 +4,9 @@ import net.minecraft.block.BlockLiquid
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.IChatComponent
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.ITextComponent
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.PlayerDropsEvent
@@ -51,8 +51,8 @@ object DeathHandler {
         }
     }
 
-    fun World.spawnGrave(pos: BlockPos, entityPlayerID: UUID, drops: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: IChatComponent?): Boolean {
-        val blockHardness = getBlockState(pos).block.getBlockHardness(this, pos)
+    fun World.spawnGrave(pos: BlockPos, entityPlayerID: UUID, drops: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: ITextComponent?): Boolean {
+        val blockHardness = getBlockState(pos).getBlockHardness(this, pos)
         if (blockHardness < 0)
             return false
 
@@ -65,8 +65,8 @@ object DeathHandler {
     fun Entity.findIdealGravePos(): BlockPos {
         Debug.log.finest("finding ideal grave pos")
 
-        if (worldObj.isLiquidBlock(position)) {
-            val possibleFloatingPosition = worldObj.findFloatingPosition(position)
+        if (world.isLiquidBlock(position)) {
+            val possibleFloatingPosition = world.findFloatingPosition(position)
             if (possibleFloatingPosition != null) {
                 Debug.log.finest("found floating pos $possibleFloatingPosition")
                 return possibleFloatingPosition
@@ -77,7 +77,7 @@ object DeathHandler {
         if (nearestGroundPos != null)
             return nearestGroundPos
 
-        return Debug.time("findNearestIdealGravePos") { worldObj.findNearestIdealGravePos(position) }
+        return Debug.time("findNearestIdealGravePos") { world.findNearestIdealGravePos(position) }
     }
 
     fun Entity.findNearestGroundPos(searchDistance: Double): BlockPos? {
@@ -134,7 +134,7 @@ object DeathHandler {
     fun World.isIdealGravePosition(pos: BlockPos): Boolean {
         val isAir = isAirBlock(pos)
         val downBlockState = getBlockState(pos.down())
-        val goodPlatform = downBlockState.block.isSideSolid(this, pos.down(), EnumFacing.UP)
+        val goodPlatform = downBlockState.isSideSolid(this, pos.down(), EnumFacing.UP)
         val b = isAir and goodPlatform
         Debug.log.finest("$pos ${if (b) "is" else "is not"} an ideal grave position")
         return b

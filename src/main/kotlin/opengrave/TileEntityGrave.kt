@@ -7,8 +7,7 @@ import net.minecraft.inventory.InventoryHelper
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.IChatComponent
-import net.minecraft.util.IChatComponent.Serializer
+import net.minecraft.util.text.ITextComponent
 import java.util.*
 
 class TileEntityGrave : TileEntity() {
@@ -24,14 +23,14 @@ class TileEntityGrave : TileEntity() {
     var entityPlayerID: UUID? = null
     var inventory: Array<ItemStack?> = emptyArray()
     var baubles: Array<ItemStack?> = emptyArray()
-    var deathMessage: IChatComponent? = null
+    var deathMessage: ITextComponent? = null
 
     private val inventoryWrapper: IInventory
         get() = InventoryBasic("throwaway", false, inventory.size + baubles.size).apply {
             (inventory + baubles).forEachIndexed { i, stack -> setInventorySlotContents(i, stack) }
         }
 
-    fun takeDrops(entityPlayerID: UUID, items: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: IChatComponent?) {
+    fun takeDrops(entityPlayerID: UUID, items: Array<ItemStack?>, baubles: Array<ItemStack?>, deathMessage: ITextComponent?) {
         this.entityPlayerID = entityPlayerID
         this.inventory = items
         this.baubles = baubles
@@ -103,11 +102,11 @@ class TileEntityGrave : TileEntity() {
         }
 
         val json = rootTagCompound?.getString(DEATH_MESSAGE_NBT_KEY).orEmpty()
-        deathMessage = Serializer.jsonToComponent(json)
+        deathMessage = ITextComponent.Serializer.jsonToComponent(json)
     }
 
-    override fun writeToNBT(compound: NBTTagCompound?) {
-        super.writeToNBT(compound)
+    override fun serializeNBT(): NBTTagCompound {
+        val compound = super.serializeNBT()
         val rootTagCompound = NBTTagCompound()
 
         val entityPlayerIDString = entityPlayerID?.toString() ?: ""
@@ -117,10 +116,12 @@ class TileEntityGrave : TileEntity() {
 
         rootTagCompound.setTag(BAUBLES_NBT_KEY, baubles.toNBTTag())
 
-        val deathMessageJson = Serializer.componentToJson(deathMessage)
+        val deathMessageJson = ITextComponent.Serializer.componentToJson(deathMessage)
         rootTagCompound.setString(DEATH_MESSAGE_NBT_KEY, deathMessageJson)
 
-        compound?.setTag(ID, rootTagCompound) ?: OpenGrave.log.error("$this unable to write to nbt!")
+        compound.setTag(ID, rootTagCompound)
+
+        return compound
     }
 
     override fun toString() = "TileEntityGrave@$pos"
