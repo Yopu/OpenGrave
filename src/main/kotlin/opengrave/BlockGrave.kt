@@ -9,9 +9,11 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.EnumBlockRenderType
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.RayTraceResult
 import net.minecraft.world.Explosion
+import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import java.util.*
 
@@ -65,6 +67,10 @@ object BlockGrave : BlockContainer(Material.ROCK) {
     override fun getRenderType(p_getRenderType_1_: IBlockState?): EnumBlockRenderType = EnumBlockRenderType.MODEL
     override fun isOpaqueCube(p_isOpaqueCube_1_: IBlockState?): Boolean = false
     override fun isFullCube(p_isFullCube_1_: IBlockState?): Boolean = false
+
+    override fun getBoundingBox(state: IBlockState?, source: IBlockAccess?, pos: BlockPos?): AxisAlignedBB {
+        return AxisAlignedBB(0.0625, 0.0, 0.375, 0.9375, 0.875, 0.625)
+    }
 
     override fun createNewTileEntity(worldIn: World?, meta: Int): TileEntity = TileEntityGrave()
 }
