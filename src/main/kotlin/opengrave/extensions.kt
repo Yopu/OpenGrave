@@ -52,7 +52,7 @@ fun EntityPlayer.safeGetBaubles(): IInventory? {
 fun EntityPlayer.getBaublesArray(): Array<ItemStack?> {
     val inventory = safeGetBaubles() ?: return emptyArray()
     val itemStackList = mutableListOf<ItemStack?>()
-    for (i in 0..inventory.sizeInventory - 1) {
+    for (i in 0 until inventory.sizeInventory - 1) {
         itemStackList += inventory.getStackInSlot(i)
     }
     return itemStackList.toTypedArray()

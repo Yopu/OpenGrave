@@ -24,12 +24,13 @@ object BlockGrave : BlockContainer(Material.ROCK) {
     }
 
     override fun removedByPlayer(state: IBlockState?, worldIn: World?, pos: BlockPos?, player: EntityPlayer?, willHarvest: Boolean): Boolean {
-        if (worldIn?.isRemote ?: true)
+        if (worldIn == null || pos == null || player == null || worldIn.isRemote)
             return super.removedByPlayer(state,  worldIn, pos, player, willHarvest)
-        val tileEntityGrave = worldIn?.getTileEntity(pos) as? TileEntityGrave?
-        if (player != null)
-            tileEntityGrave?.returnPlayerItems(player)
-        return super.removedByPlayer(state,  worldIn, pos, player, willHarvest)
+
+        val tileEntityGrave = worldIn.getTileEntity(pos) as? TileEntityGrave?
+        tileEntityGrave?.returnPlayerItems(player)
+
+        return super.removedByPlayer(state, worldIn, pos, player, willHarvest)
     }
 
     override fun breakBlock(worldIn: World?, pos: BlockPos?, state: IBlockState?) {
@@ -44,8 +45,8 @@ object BlockGrave : BlockContainer(Material.ROCK) {
             Debug.log.finest("${tileEntityGrave.entityPlayerID}\tInventory:\t${tileEntityGrave.inventory.joinToString()}")
             Debug.log.finest("${tileEntityGrave.entityPlayerID}\tBaubles:\t${tileEntityGrave.baubles.joinToString()}")
 
-            if (tileEntityGrave.deathMessage != null) {
-                playerIn?.sendStatusMessage(tileEntityGrave.deathMessage, false)
+            tileEntityGrave.deathMessage?.let {
+                playerIn?.sendStatusMessage(it, false)
             }
         }
         return false

@@ -46,7 +46,7 @@ object Debug {
             val rightClickingAir = event is PlayerInteractEvent.RightClickEmpty
 
             val crouching = entityPlayer.isSneaking
-            val usingStick = entityPlayer.heldItemMainhand?.item == Items.STICK
+            val usingStick = entityPlayer.heldItemMainhand.item == Items.STICK
 
             if ((rightClickingBlock and usingStick) xor (rightClickingAir and crouching and usingStick)) {
                 val pos = entityPlayer.findIdealGravePos()
