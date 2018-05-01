@@ -1,6 +1,7 @@
 package opengrave
 
-import baubles.api.BaublesApi
+import baubles.api.cap.BaublesCapabilities
+import baubles.api.inv.BaublesInventoryWrapper
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.InventoryBasic
@@ -38,13 +39,20 @@ fun BlockPos.neighbors(offset: Int): List<BlockPos> {
     return positions
 }
 
+class CapabilityError : Exception()
+
 fun EntityPlayer.safeGetBaubles(): IInventory? {
     try {
-        val inventory = BaublesApi.getBaubles(this)
+        val handler = getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, null) ?: throw CapabilityError()
+        handler.setPlayer(this)
         Debug.log.finest("Received baubles $inventory for $this.")
-        return inventory
-    } catch (e: NoClassDefFoundError) {
-        Debug.log.finest("Baubles API not present when retrieving $this's baubles!")
+        return BaublesInventoryWrapper(handler, this)
+    } catch (e: Exception) {
+        when (e) {
+            is NoClassDefFoundError, is CapabilityError -> {
+                Debug.log.finest("Baubles API not present when retrieving $this's baubles!")
+            }
+        }
         return null
     }
 }
