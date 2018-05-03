@@ -11,10 +11,10 @@ fun NBTTagCompound.getItemStackArray(key: String): Array<ItemStack?> {
     if (size == 0)
         return emptyArray()
     val itemStackList = Array<ItemStack?>(size) { null }
-    for (i in 0..size - 1) {
+    for (i in 0 until size - 1) {
         val nbtTagCompound = tagList.getCompoundTagAt(i)
         val slot = nbtTagCompound.getInteger("slot")
-        val itemStack = ItemStack.loadItemStackFromNBT(nbtTagCompound)
+        val itemStack = ItemStack(nbtTagCompound)
         itemStackList[slot] = itemStack
     }
     return itemStackList
