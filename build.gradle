@@ -21,7 +21,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 def mcversion = '1.12.2'
 def forgeversion = '14.23.3.2655'
 
-version = "$mcversion-3.0"
+version = "$mcversion-3.1"
 group = 'yopu.opengrave'
 archivesBaseName = 'OpenGrave'
 

@@ -68,7 +68,7 @@ class TileEntityGrave : TileEntity() {
             var possibleIndex = index
             while (possibleIndex < sizeInventory) {
                 if (getStackInSlot(possibleIndex).isEmpty && isItemValidForSlot(possibleIndex, itemStack)) {
-                    setInventorySlotContents(index, itemStack)
+                    setInventorySlotContents(possibleIndex, itemStack)
                     dispensed = true
                     break
                 } else {
