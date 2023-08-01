@@ -21,7 +21,7 @@ object BlockGrave : BlockContainer(Material.ROCK) {
 
     init {
         setRegistryName("blockgrave")
-        setHardness(5.0F)
+        setHardness(1.0F)
         setResistance(6000000.0F)
     }
 
